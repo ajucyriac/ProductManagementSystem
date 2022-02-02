@@ -9,10 +9,12 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="10.3.6" />
+    <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ProductManagement.Api.Common\ProductManagement.Api.Common.csproj" />
     <ProjectReference Include="..\ProductManagement.Api.Data.Model\ProductManagement.Api.Data.Model.csproj" />
     <ProjectReference Include="..\ProductManagement.Api.Data\ProductManagement.Api.Data.csproj" />
     <ProjectReference Include="..\ProductManagement.Api.Model\ProductManagement.Api.Model.csproj" />

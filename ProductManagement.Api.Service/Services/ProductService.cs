@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using ProductManagement.Api.Common.Exceptions;
 using ProductManagement.Api.Data.Interface;
 using ProductManagement.Api.Data.Models;
 using ProductManagement.Api.Model;
@@ -22,7 +23,11 @@ namespace ProductManagement.Api.Service.Services
         public async Task<bool> DeleteProduct(int id)
         {
             var isDeleted  = await _productRepository.Delete(id);
-            return isDeleted;
+            
+            if (isDeleted == false)
+                throw new AppException("Product not exist.");
+
+            return true;
         }
 
         public async Task<IEnumerable<ProductDetails>> GetAllProduct()
@@ -35,6 +40,10 @@ namespace ProductManagement.Api.Service.Services
         public async Task<ProductDetails> GetProductById(int id)
         {
             var result = await _productRepository.GetById(id);
+
+            if (result == null)
+                throw new AppException("Product not exist.");
+
             var res = _mapper.Map<ProductDetails>(result);
             return res;
         }
@@ -50,13 +59,11 @@ namespace ProductManagement.Api.Service.Services
             else
             {
                 var result = await _productRepository.GetById(product.ProductId);
-                if (result != null)
-                {
-                    await _productRepository.Update(entity);
-                }
-                else
-                    return null;
 
+                if (result == null)
+                    throw new AppException("Product not exist.");
+                
+                await _productRepository.Update(entity);
             }
             return _mapper.Map<ProductDetails>(entity);
             

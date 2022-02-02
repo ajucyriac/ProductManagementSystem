@@ -17,6 +17,8 @@ namespace ProductManagement.Api.Data.Interface
         Task<IEnumerable<T>> FindAll(Expression<Func<T, bool>> predicate);
 
         Task<T> Find(Expression<Func<T, bool>> predicate);
+
+        Task<bool> Any(Expression<Func<T, bool>> predicate);
     }
 }
 

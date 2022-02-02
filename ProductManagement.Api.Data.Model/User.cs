@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ProductManagement.Api.Data.Models
 {
@@ -22,9 +23,9 @@ namespace ProductManagement.Api.Data.Models
         [Required]
         public string Email { get; set; }
 
-        [Column(TypeName = "varchar(100)")]
+        [JsonIgnore]
         [Required]
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
 
 
         [Column(TypeName = "datetime")]

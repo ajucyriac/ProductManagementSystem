@@ -25,11 +25,14 @@ namespace ProductManagement.Api.Controllers
         public async Task<ActionResult<AuthenticationResponse>> GenerateToken(AuthenticationDetails authenticationDetails)
         {
             var response = await _authenticationService.AutenticateUser(authenticationDetails);
-
-            if (response == null)
-                return BadRequest(new { message = "Username or password is incorrect" });
-
             return Ok(response);
+        }
+
+        [HttpPost("register")]
+        public async Task<ActionResult<UserDetails>> RegisterUser(RegisterRequest userDetails)
+        {
+            var result = await _authenticationService.Register(userDetails);
+            return result;
         }
     }
 }

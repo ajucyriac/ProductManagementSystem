@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using ProductManagement.Api.Common.Exceptions;
 using ProductManagement.Api.Data.Interface;
 using ProductManagement.Api.Data.Models;
 using ProductManagement.Api.Model;
@@ -25,12 +26,16 @@ namespace ProductManagement.Api.Service.Services
 
         public async Task<AuthenticationResponse> AutenticateUser(AuthenticationDetails authDetails)
         {
-            var userInfo = await _userRepository.Find(x => x.Email.Equals(authDetails.UserName) && x.Password.Equals(authDetails.Password));
+            
 
-            var userDetails = _mapper.Map<User, UserDetails>(userInfo);
 
-            // return null if user not found
-            if (userInfo == null) return null;
+            var user = await _userRepository.Find(x => x.Email.Equals(authDetails.EmailAddress));
+
+            // validate
+            if (user == null || !BCrypt.Net.BCrypt.Verify(authDetails.Password, user.PasswordHash))
+                throw new AppException("Username or password is incorrect");
+
+            var userDetails = _mapper.Map<UserDetails>(user);
 
             // authentication successful so generate jwt token
             var token = GenerateJwtToken(userDetails);
@@ -41,18 +46,35 @@ namespace ProductManagement.Api.Service.Services
         public async Task<UserDetails> GetById(int userId)
         {
             var result = await _userRepository.GetById(userId);
+
             return _mapper.Map<User, UserDetails>(result);
+        }
+
+        public async Task<UserDetails> Register(RegisterRequest userInfo)
+        {
+            var user = _mapper.Map<RegisterRequest, User>(userInfo);
+
+
+            var isUserExist = await _userRepository.Any(x => x.Email.Equals(user.Email));
+            if (isUserExist)
+                throw new AppException("Username '" + user.Email + "' is already exist");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userInfo.Password);
+            user.CreateDate = DateTime.Now;
+            await _userRepository.Create(user);
+
+            return _mapper.Map<UserDetails>(user);
         }
 
         private string GenerateJwtToken(UserDetails userDetails)
         {
-            // generate token that is valid for 7 days
+            // generate token that is valid for 5 minutes
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("id", userDetails.UserId.ToString()) }),
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow.AddMinutes(30),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

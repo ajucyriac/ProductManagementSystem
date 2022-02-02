@@ -12,6 +12,10 @@ namespace ProductManagement.Api
                 .ForMember(dest=> dest.Email, opt => opt.MapFrom(src=>src.EmailAddress))
                 .ReverseMap();
 
+            CreateMap<RegisterRequest, User>()
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.EmailAddress));
+                
+
             CreateMap<ProductDetails, Product>().ReverseMap();
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ProductManagement.Api.Common.Exceptions;
 using ProductManagement.Api.Helpers;
 using ProductManagement.Api.Model;
 using ProductManagement.Api.Service.Interface;
@@ -28,12 +29,6 @@ namespace ProductManagement.Api.Controllers
         public async Task<ActionResult<ProductDetails>> GetProductById(int id)
         {
             var result = await _productService.GetProductById(id);
-
-            if (result == null)
-            {
-                return NotFound("Product not exist");
-            }
-
             return result;
         }
 
@@ -42,9 +37,9 @@ namespace ProductManagement.Api.Controllers
         {
             
              var result = await _productService.UpsertProduct(product);
-            
+
             if (result == null)
-                return NotFound("Product not exist");
+                throw new AppException("Product not exist.");
 
             return result;
         }
@@ -53,11 +48,6 @@ namespace ProductManagement.Api.Controllers
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var result = await _productService.DeleteProduct(id);
-            if (result == false)
-            {
-                return NotFound("Product not exist");
-            }
-
             return Ok("Product successfully removed");
         }
     }

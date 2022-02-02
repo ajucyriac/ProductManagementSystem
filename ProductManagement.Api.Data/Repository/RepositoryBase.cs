@@ -19,7 +19,6 @@ namespace ProductManagement.Api.Data.Repository
             return _dbContext.Set<T>().AsNoTracking();
         }
 
-        
         public async Task<T> GetById(int id)
         {
             var res = await _dbContext.Set<T>().FindAsync(id);
@@ -35,6 +34,8 @@ namespace ProductManagement.Api.Data.Repository
             await _dbContext.Set<T>().AddAsync(entity);
             await _dbContext.SaveChangesAsync();
         }
+
+        
 
         public async Task Update(T entity)
         {
@@ -62,6 +63,11 @@ namespace ProductManagement.Api.Data.Repository
         public async Task<T> Find(Expression<Func<T, bool>> predicate)
         {
             return await _dbContext.Set<T>().SingleOrDefaultAsync(predicate);
+        }
+
+        public async Task<bool> Any(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbContext.Set<T>().AnyAsync(predicate);
         }
     }
 }

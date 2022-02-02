@@ -11,5 +11,7 @@ namespace ProductManagement.Api.Service.Interface
     {
         Task<AuthenticationResponse> AutenticateUser(AuthenticationDetails authDetails);
         Task<UserDetails> GetById(int userId);
+
+        Task<UserDetails> Register(RegisterRequest userInfo);
     }
 }
